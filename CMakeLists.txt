@@ -62,3 +62,24 @@ target_link_libraries(bcscan PRIVATE
 )
 
 target_include_directories(bcscan PRIVATE src)
+
+# Install rules (required by CPack)
+install(TARGETS bcscan RUNTIME DESTINATION bin)
+
+# Packaging
+set(CPACK_PACKAGE_NAME "bcscan")
+set(CPACK_PACKAGE_VENDOR "James Burnett")
+set(CPACK_PACKAGE_CONTACT "jamesburnettio@proton.me")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Desktop controller for the Uniden BC125AT scanner")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+
+# Debian
+set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6core6, libqt6gui6, libqt6widgets6, libqt6serialport6")
+
+# RPM
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtbase >= 6.0, qt6-qtserialport >= 6.0")
+set(CPACK_RPM_PACKAGE_GROUP "Applications/Utilities")
+
+include(CPack)

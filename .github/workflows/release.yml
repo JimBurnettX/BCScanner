@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch: {}
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential qt6-base-dev libqt6serialport6-dev
+
+      - name: Build and package
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
+          cd build && cpack -G DEB
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: debian-package
+          path: build/*.deb
+
+  build-rpm:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          dnf install -y cmake gcc-c++ make qt6-qtbase-devel qt6-qtserialport-devel rpm-build
+
+      - name: Build and package
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
+          cd build && cpack -G RPM
+
+      - name: Upload .rpm
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm-package
+          path: build/*.rpm
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-deb, build-rpm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            debian-package/*.deb
+            rpm-package/*.rpm
+          generate_release_notes: true
