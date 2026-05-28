@@ -75,7 +75,7 @@ set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 
 # Debian
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6core6, libqt6gui6, libqt6widgets6, libqt6serialport6")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5core5a, libqt5gui5, libqt5widgets5, libqt5serialport5")
 
 # RPM
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
