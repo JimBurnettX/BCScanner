@@ -8,16 +8,14 @@ on:
 
 jobs:
   build-deb:
-    runs-on: ubuntu-latest
-    container:
-      image: debian:13
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev dpkg-dev file
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential qtbase5-dev libqt5serialport5-dev dpkg-dev
 
       - name: Build and package
         run: |
