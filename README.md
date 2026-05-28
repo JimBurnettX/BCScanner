@@ -8,6 +8,29 @@ Connect your scanner over USB, monitor activity in real time, program channels, 
 
 ---
 
+## Download
+
+**[→ Download the latest release](https://github.com/jamesburnettio/BCScanner/releases/latest)**
+
+Pre-built installers are available for Linux Mint / Debian (`.deb`), Fedora / RHEL (`.rpm`), and Windows (`.exe`).
+
+All releases: [github.com/jamesburnettio/BCScanner/releases](https://github.com/jamesburnettio/BCScanner/releases)
+
+---
+
+## Table of Contents
+
+- [Download](#download)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Requirements](#requirements)
+- [Building](#building)
+- [Scanner Compatibility](#scanner-compatibility)
+- [Project Structure](#project-structure)
+- [License](#license)
+
+---
+
 ## Features
 
 - **Real-time LCD mirror** — frequency, channel label, signal strength, and bank indicators update live via the scanner's `STS` command (4×/sec)
