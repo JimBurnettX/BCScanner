@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=BCScan
+Comment=Uniden BC125AT Scanner Controller
+Exec=bcscan
+Icon=bcscan
+Terminal=false
+Type=Application
+Categories=Utility;HamRadio;
+Keywords=scanner;radio;uniden;bc125at;frequency;

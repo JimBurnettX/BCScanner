@@ -65,6 +65,10 @@ target_include_directories(bcscan PRIVATE src)
 
 # Install rules (required by CPack)
 install(TARGETS bcscan RUNTIME DESTINATION bin)
+install(FILES assets/bcscan.svg
+    DESTINATION share/icons/hicolor/scalable/apps)
+install(FILES assets/bcscan.desktop
+    DESTINATION share/applications)
 
 # Packaging
 set(CPACK_PACKAGE_NAME "bcscan")
@@ -74,6 +78,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Desktop controller for the Uniden BC125AT
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 
 # Debian
+set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
