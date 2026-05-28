@@ -65,10 +65,27 @@ target_include_directories(bcscan PRIVATE src)
 
 # Install rules (required by CPack)
 install(TARGETS bcscan RUNTIME DESTINATION bin)
-install(FILES assets/bcscan.svg
-    DESTINATION share/icons/hicolor/scalable/apps)
-install(FILES assets/bcscan.desktop
-    DESTINATION share/applications)
+
+if(UNIX)
+    install(FILES assets/bcscan.svg
+        DESTINATION share/icons/hicolor/scalable/apps)
+    install(FILES assets/bcscan.desktop
+        DESTINATION share/applications)
+endif()
+
+if(WIN32)
+    get_target_property(_qmake_exe ${QT}::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin_dir "${_qmake_exe}" DIRECTORY)
+    install(CODE "
+        execute_process(COMMAND
+            \"${_qt_bin_dir}/windeployqt.exe\"
+            --no-translations
+            --no-system-d3d-compiler
+            --no-opengl-sw
+            \"\${CMAKE_INSTALL_PREFIX}/bin/bcscan.exe\"
+        )
+    ")
+endif()
 
 # Packaging
 set(CPACK_PACKAGE_NAME "bcscan")
@@ -78,7 +95,9 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Desktop controller for the Uniden BC125AT
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 
 # Debian
-set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+if(NOT WIN32)
+    set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+endif()
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 
@@ -86,5 +105,16 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
 set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtbase >= 6.0, qt6-qtserialport >= 6.0")
 set(CPACK_RPM_PACKAGE_GROUP "Applications/Utilities")
+
+# NSIS (Windows)
+set(CPACK_NSIS_DISPLAY_NAME "BCScan")
+set(CPACK_NSIS_PACKAGE_NAME "BCScan")
+set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
+set(CPACK_NSIS_EXECUTABLES_DIRECTORY "bin")
+set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+set(CPACK_NSIS_CREATE_ICONS_EXTRA
+    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\BCScan.lnk' '$INSTDIR\\\\bin\\\\bcscan.exe'")
+set(CPACK_NSIS_DELETE_ICONS_EXTRA
+    "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\BCScan.lnk'")
 
 include(CPack)
