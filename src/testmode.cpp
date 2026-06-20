@@ -48,15 +48,21 @@ static void checkInt(const char* name, int got, int expected) {
 // field[20] (signal strength) is always present.
 // ---------------------------------------------------------------------------
 
+static QStringList stsFields() {
+    QStringList f;
+    for (int i = 0; i < 21; ++i) f << QString{};
+    return f;
+}
+
 static QString stsScanning(const QString& bankLabel = "BANK1") {
-    QStringList f(21, QString{});
+    QStringList f = stsFields();
     f[0] = "STS"; f[1] = "011000"; f[4] = bankLabel; f[6] = " SCAN ";
     return f.join(',');
 }
 
 static QString stsActive(const QString& chLabel, const QString& mainDisplay,
                           const QString& ctcss = {}, int sig = 3) {
-    QStringList f(21, QString{});
+    QStringList f = stsFields();
     f[0] = "STS"; f[1] = "011000";
     f[4] = chLabel; f[6] = mainDisplay; f[8] = ctcss;
     f[20] = QString::number(sig);
@@ -64,7 +70,7 @@ static QString stsActive(const QString& chLabel, const QString& mainDisplay,
 }
 
 static QString stsSearch(const QString& label, const QString& freq, int sig = 3) {
-    QStringList f(21, QString{});
+    QStringList f = stsFields();
     f[0] = "STS"; f[1] = "011000";
     f[4] = label; f[6] = freq;
     f[20] = QString::number(sig);

@@ -7,36 +7,6 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  build-deb-ubuntu22:
-    name: Build .deb (Ubuntu 22.04 / Qt5)
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential qtbase5-dev libqt5serialport5-dev dpkg-dev
-
-      - name: Build
-        run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel $(nproc)
-
-      - name: Run self-test
-        run: ./build/bcscan --test
-
-      - name: Package
-        run: |
-          cd build && cpack -G DEB
-          mv *.deb bcscan-ubuntu22.deb
-
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: deb-ubuntu22
-          path: build/bcscan-ubuntu22.deb
-
   build-deb-debian13:
     name: Build .deb (Debian 13 / Qt6)
     runs-on: ubuntu-latest
@@ -169,7 +139,7 @@ jobs:
 
   release:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-deb-ubuntu22, build-deb-debian13, build-deb-ubuntu26, build-rpm, build-windows]
+    needs: [build-deb-debian13, build-deb-ubuntu26, build-rpm, build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -181,7 +151,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            deb-ubuntu22/*.deb
             deb-debian13/*.deb
             deb-ubuntu26/*.deb
             rpm-package/*.rpm
