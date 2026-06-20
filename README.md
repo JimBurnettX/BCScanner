@@ -10,11 +10,11 @@ Connect your scanner over USB, monitor activity in real time, program channels, 
 
 ## Download
 
-**[→ Download the latest release](https://github.com/jamesburnettio/BCScanner/releases/latest)**
+**[→ Download the latest release](https://github.com/JimBurnettX/BCScanner/releases/latest)**
 
 Pre-built installers are available for Linux Mint / Debian (`.deb`), Fedora / RHEL (`.rpm`), and Windows (`.exe`).
 
-All releases: [github.com/jamesburnettio/BCScanner/releases](https://github.com/jamesburnettio/BCScanner/releases)
+All releases: [github.com/JimBurnettX/BCScanner/releases](https://github.com/JimBurnettX/BCScanner/releases)
 
 ---
 
@@ -96,7 +96,7 @@ sudo apt install git cmake build-essential qt6-base-dev qt6-serialport-dev
 **2. Clone and build**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/BCScanner.git
+git clone https://github.com/JimBurnettX/BCScanner.git
 cd BCScanner
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
@@ -134,7 +134,7 @@ The scanner appears as `/dev/ttyUSB0` or `/dev/ttyACM0`.
 #### Option A — Qt Creator (easiest)
 
 ```
-1. git clone https://github.com/YOUR_USERNAME/BCScanner.git
+1. git clone https://github.com/JimBurnettX/BCScanner.git
 2. Open Qt Creator
 3. File → Open File or Project → select BCScanner\CMakeLists.txt
 4. Qt Creator detects your installed kit automatically — click Configure
@@ -148,7 +148,7 @@ The executable is placed in `build\Release\bcscan.exe` (MSVC) or `build\bcscan.e
 Open the **x64 Native Tools Command Prompt for VS 2022**, then:
 
 ```bat
-git clone https://github.com/YOUR_USERNAME/BCScanner.git
+git clone https://github.com/JimBurnettX/BCScanner.git
 cd BCScanner
 cmake -B build -G "Visual Studio 17 2022" -DCMAKE_PREFIX_PATH="C:\Qt\6.x.x\msvc2022_64"
 cmake --build build --config Release
@@ -161,7 +161,7 @@ Replace `6.x.x` and `msvc2022_64` with your actual installed Qt version and kit 
 Open the **Qt MinGW command prompt** (installed alongside Qt), then:
 
 ```bat
-git clone https://github.com/YOUR_USERNAME/BCScanner.git
+git clone https://github.com/JimBurnettX/BCScanner.git
 cd BCScanner
 cmake -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:\Qt\6.x.x\mingw_64"
 cmake --build build --parallel
@@ -202,7 +202,7 @@ brew install qt cmake
 **2. Clone and build**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/BCScanner.git
+git clone https://github.com/JimBurnettX/BCScanner.git
 cd BCScanner
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$(brew --prefix qt)"
 cmake --build build --parallel
