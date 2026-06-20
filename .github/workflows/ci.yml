@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test-debian13:
+    name: Test (Debian 13 / Qt6)
+    runs-on: ubuntu-latest
+    container:
+      image: debian:13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
+
+      - name: Run self-test
+        run: ./build/bcscan --test
+
+  test-ubuntu26:
+    name: Test (Ubuntu 26.04 / Qt6)
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:26.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
+
+      - name: Run self-test
+        run: ./build/bcscan --test
+
+  test-fedora44:
+    name: Test (Fedora 44 / Qt6)
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:44
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: dnf install -y cmake gcc-c++ make qt6-qtbase-devel qt6-qtserialport-devel
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
+
+      - name: Run self-test
+        run: ./build/bcscan --test
+
+  test-windows:
+    name: Test (Windows / Qt6)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.7.*'
+          arch: 'win64_msvc2019_64'
+          modules: 'qtserialport'
+          cache: true
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+
+      - name: Run self-test
+        shell: pwsh
+        run: |
+          $qtBin  = (Get-Command qmake.exe).Source | Split-Path
+          $env:QT_PLUGIN_PATH = Join-Path (Split-Path $qtBin) "plugins"
+          .\build\Release\bcscan.exe --test

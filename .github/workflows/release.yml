@@ -7,52 +7,100 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  build-deb:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential qtbase5-dev libqt5serialport5-dev dpkg-dev
-
-      - name: Build and package
-        run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel $(nproc)
-          cd build && cpack -G DEB
-
-      - name: Upload .deb
-        uses: actions/upload-artifact@v4
-        with:
-          name: debian-package
-          path: build/*.deb
-
-  build-rpm:
+  build-deb-debian13:
+    name: Build .deb (Debian 13 / Qt6)
     runs-on: ubuntu-latest
     container:
-      image: fedora:40
+      image: debian:13
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
-          dnf install -y cmake gcc-c++ make qt6-qtbase-devel qt6-qtserialport-devel rpm-build
+          apt-get update
+          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev dpkg-dev
 
-      - name: Build and package
+      - name: Build
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $(nproc)
-          cd build && cpack -G RPM
 
-      - name: Upload .rpm
+      - name: Run self-test
+        run: ./build/bcscan --test
+
+      - name: Package
+        run: |
+          cd build && cpack -G DEB
+          mv *.deb bcscan-debian13.deb
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-debian13
+          path: build/bcscan-debian13.deb
+
+  build-deb-ubuntu26:
+    name: Build .deb (Ubuntu 26.04 / Qt6)
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:26.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev dpkg-dev
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
+
+      - name: Run self-test
+        run: ./build/bcscan --test
+
+      - name: Package
+        run: |
+          cd build && cpack -G DEB
+          mv *.deb bcscan-ubuntu26.deb
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-ubuntu26
+          path: build/bcscan-ubuntu26.deb
+
+  build-rpm:
+    name: Build .rpm (Fedora 44 / Qt6)
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:44
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: dnf install -y cmake gcc-c++ make qt6-qtbase-devel qt6-qtserialport-devel rpm-build
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
+
+      - name: Run self-test
+        run: ./build/bcscan --test
+
+      - name: Package
+        run: cd build && cpack -G RPM
+
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: rpm-package
           path: build/*.rpm
 
   build-windows:
+    name: Build .exe (Windows / Qt6)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -73,10 +121,17 @@ jobs:
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release
 
+      - name: Run self-test
+        shell: pwsh
+        run: |
+          $qtBin  = (Get-Command qmake.exe).Source | Split-Path
+          $env:QT_PLUGIN_PATH = Join-Path (Split-Path $qtBin) "plugins"
+          .\build\Release\bcscan.exe --test
+
       - name: Package
         run: cd build && cpack -G NSIS -C Release
 
-      - name: Upload installer
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
@@ -84,7 +139,7 @@ jobs:
 
   release:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-deb, build-rpm, build-windows]
+    needs: [build-deb-debian13, build-deb-ubuntu26, build-rpm, build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -96,7 +151,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            debian-package/*.deb
+            deb-debian13/*.deb
+            deb-ubuntu26/*.deb
             rpm-package/*.rpm
             windows-installer/*.exe
           generate_release_notes: true

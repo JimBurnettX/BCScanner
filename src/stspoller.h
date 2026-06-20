@@ -32,6 +32,7 @@ struct StsStatus {
     bool    squelchOpen     = false; // true when state == Active or Search with signal
     int     signalStrength  = 0;     // 0-5, from field[20] of STS response
     quint16 bankMask        = 0;     // bit 0='1'…bit 8='9', bit 9='0'; from field[12]
+    QString ctcssDcs;               // live tone from field[8]: "C67.0", "DCS032", or empty
     QString serviceLabel;   // non-empty when state==Search and scanner is in service search mode
                             // e.g. "Police", "Fire/Emergency", "HAM Radio", etc.
     QString raw;            // full raw STS line
@@ -52,6 +53,8 @@ public:
     QString       currentFrequency() const { return m_currentFreq; }
     StsStatus     lastStatus()       const { return m_lastStatus; }
 
+    static StsStatus parse(const QString& raw);
+
 signals:
     void statusUpdated(const StsStatus& status);  // every successful poll
     void squelchOpened(const StsStatus& status);  // transition: not-active → active
@@ -62,7 +65,6 @@ private slots:
     void onPollTimer();
 
 private:
-    static StsStatus parse(const QString& raw);
     static QString   cleanAscii(const QString& s);
 
     ScannerSerial* m_scanner;

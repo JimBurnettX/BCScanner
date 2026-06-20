@@ -30,6 +30,7 @@ set(SOURCES
     src/sqlpoller.cpp
     src/stspoller.cpp
     src/debugwindow.cpp
+    src/testmode.cpp
 )
 
 set(HEADERS
