@@ -8,7 +8,6 @@ struct TransmissionRecord {
     int channelIndex = 0;
     QString channelLabel;
     QString frequency;   // e.g. "462.5625"
-    int ctcssDcsCode = 0;
     QString ctcssDcsLabel;
     int durationSeconds = 0;
 };
@@ -19,7 +18,8 @@ public:
     explicit TransmissionLogger(QObject* parent = nullptr);
 
     void beginTransmission(int channelIndex, const QString& label,
-                           const QString& frequency, int ctcssDcsCode);
+                           const QString& frequency, const QString& ctcssDcsLabel);
+    void updateCtcssDcs(const QString& label);
     void endTransmission();
     void cancelTransmission();
 

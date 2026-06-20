@@ -30,7 +30,7 @@ void AppSettings::setLogDirectory(const QString& dir) {
 }
 
 int AppSettings::autoSkipSeconds() const {
-    return s().value("scan/autoSkipSeconds", 10).toInt();
+    return s().value("scan/autoSkipSeconds", 45).toInt();
 }
 void AppSettings::setAutoSkipSeconds(int seconds) {
     s().setValue("scan/autoSkipSeconds", seconds);

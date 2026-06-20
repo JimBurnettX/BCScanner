@@ -910,6 +910,10 @@ void MainWindow::onStsStatusUpdated(const StsStatus& status)
     // They don't count for or against the debounce.
     if (status.state == StsStatus::State::Unknown) return;
 
+    // Latch CTCSS/DCS code whenever the scanner shows it mid-transmission
+    if (m_logger->isActive() && !status.ctcssDcs.isEmpty())
+        m_logger->updateCtcssDcs(status.ctcssDcs);
+
     // Update number-key button appearance from the bank-activity mask every poll
     for (int i = 0; i < 10; ++i) {
         const bool active = (status.bankMask >> i) & 1u;
@@ -1031,17 +1035,19 @@ void MainWindow::onSquelchOpened(const StsStatus& status)
     int     chIdx = status.channelNumber;
     QString label = status.channelLabel;
     QString freq  = status.frequency;
-    int     ctcss = 0;
+    QString ctcssLabel;
 
     if (chIdx > 0 && hasCachedChannel(chIdx)) {
         const ChannelInfo& c = cachedChannel(chIdx);
         label = c.name.isEmpty() ? label : c.name;
         freq  = c.freqMhz().isEmpty() ? freq : c.freqMhz();
-        ctcss = c.ctcssDcs;
+        ctcssLabel = !status.ctcssDcs.isEmpty() ? status.ctcssDcs : ctcssDcsLabel(c.ctcssDcs);
         setCurrentChannelIndex(chIdx);
+    } else {
+        ctcssLabel = status.ctcssDcs;
     }
 
-    m_logger->beginTransmission(chIdx, label, freq, ctcss);
+    m_logger->beginTransmission(chIdx, label, freq, ctcssLabel);
     m_autoTransmission = true;
     m_holdSeconds = 0;
     m_holdPollTimer->start();
@@ -1220,6 +1226,7 @@ void MainWindow::onLoadChannelCache() {
 
 void MainWindow::closeEvent(QCloseEvent* event) {
     AppSettings::instance().setWindowSize(width(), height());
+    if (m_stsPoller) m_stsPoller->stop();
     if (m_autoTransmission) {
         m_autoTransmission = false;
         m_logger->cancelTransmission();

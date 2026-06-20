@@ -1,6 +1,5 @@
 #include "transmissionlogger.h"
 #include "appsettings.h"
-#include "ctcssdcsdata.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDir>
@@ -8,15 +7,19 @@
 TransmissionLogger::TransmissionLogger(QObject* parent) : QObject(parent) {}
 
 void TransmissionLogger::beginTransmission(int channelIndex, const QString& label,
-                                           const QString& frequency, int ctcssDcsCode) {
-    m_current.startTime    = QDateTime::currentDateTime();
-    m_current.channelIndex = channelIndex;
-    m_current.channelLabel = label;
-    m_current.frequency    = frequency;
-    m_current.ctcssDcsCode = ctcssDcsCode;
-    m_current.ctcssDcsLabel = ctcssDcsLabel(ctcssDcsCode);
+                                           const QString& frequency, const QString& ctcssDcsLabel) {
+    m_current.startTime      = QDateTime::currentDateTime();
+    m_current.channelIndex   = channelIndex;
+    m_current.channelLabel   = label;
+    m_current.frequency      = frequency;
+    m_current.ctcssDcsLabel  = ctcssDcsLabel;
     m_current.durationSeconds = 0;
     m_active = true;
+}
+
+void TransmissionLogger::updateCtcssDcs(const QString& label) {
+    if (m_active && !label.isEmpty())
+        m_current.ctcssDcsLabel = label;
 }
 
 void TransmissionLogger::endTransmission() {

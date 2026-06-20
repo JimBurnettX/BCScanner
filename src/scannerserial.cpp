@@ -10,6 +10,7 @@ ScannerSerial::ScannerSerial(QObject* parent) : QObject(parent) {
 }
 
 ScannerSerial::~ScannerSerial() {
+    QObject::disconnect(this, nullptr, nullptr, nullptr);
     disconnectPort();
 }
 
@@ -50,6 +51,7 @@ void ScannerSerial::disconnectPort() {
         m_port = nullptr;
     }
     m_queue.clear();
+    m_current.callback = nullptr;  // prevent in-flight callback firing on a dangling object
     m_busy = false;
     m_state = State::Disconnected;
     emit disconnected();

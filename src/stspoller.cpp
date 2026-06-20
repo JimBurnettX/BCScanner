@@ -130,6 +130,8 @@ StsStatus StsPoller::parse(const QString& raw)
         s.frequency      = mActive.captured(2);
         s.squelchOpen    = true;
         s.signalStrength = parseSig();
+        if (f.size() > 8)
+            s.ctcssDcs = cleanAscii(f[8]).trimmed();
         return s;
     }
 
