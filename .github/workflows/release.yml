@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev dpkg-dev
+          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev dpkg-dev file
 
       - name: Build
         run: |
@@ -50,7 +50,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev dpkg-dev
+          apt-get install -y cmake build-essential qt6-base-dev qt6-serialport-dev dpkg-dev file
 
       - name: Build
         run: |
